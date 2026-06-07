@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>ananqiqi</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: transparent !important;
+        }
+
+        #pet {
+            position: fixed;
+            top: 100px;
+            left: 100px;
+            width: 150px;
+            user-select: none;
+            cursor: grab;
+            z-index: 9999999; /* 永远置顶 */
+        }
+
+        #pet:active { cursor: grabbing; }
+    </style>
+</head>
+
+<body>
+    <img id="pet" src="anqi.png">
+
+    <script>
+        const pet = document.getElementById('pet');
+        let speed = 4;
+        let dx = (Math.random() > 0.5 ? 1 : -1) * speed;
+        let dy = (Math.random() > 0.5 ? 1 : -1) * speed;
+        let dragging = false;
+        let offsetX, offsetY;
+
+        // 声音列表
+        const sounds = [
+            new Audio("txdyh.mp3"),
+            new Audio("hxn.mp3"),
+            new Audio("wan.mp3"),
+            new Audio("ssg.mp3"),
+            new Audio("jyo.mp3")
+        ];
+
+        // 双击播放声音
+        pet.ondblclick = () => {
+            let snd = sounds[Math.floor(Math.random() * sounds.length)];
+            snd.currentTime = 0;
+            snd.play();
+        };
+
+        // 拖动
+        pet.onmousedown = (e) => {
+            dragging = true;
+            offsetX = e.clientX - pet.getBoundingClientRect().left;
+            offsetY = e.clientY - pet.getBoundingClientRect().top;
+        };
+        window.onmousemove = (e) => {
+            if (!dragging) return;
+            pet.style.left = e.clientX - offsetX + "px";
+            pet.style.top = e.clientY - offsetY + "px";
+        };
+        window.onmouseup = () => dragging = false;
+
+        // 自动移动
+        function walk() {
+            if (dragging) return;
+
+            let x = pet.offsetLeft + dx;
+            let y = pet.offsetTop + dy;
+            let w = pet.offsetWidth;
+            let h = pet.offsetHeight;
+            let sw = window.innerWidth;
+            let sh = window.innerHeight;
+
+            // 碰边反弹
+            if (x <= 0 || x + w >= sw) dx *= -1;
+            if (y <= 0 || y + h >= sh) dy *= -1;
+
+            pet.style.left = x + "px";
+            pet.style.top = y + "px";
+        }
+
+        setInterval(walk, 30);
+    </script>
+</body>
+</html>
